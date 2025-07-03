@@ -1,0 +1,9 @@
+streamlit
+langchain
+langchain-openai
+langchain-community
+langchain-huggingface
+beautifulsoup4
+python-dotenv
+faiss-cpu
+sentence-transformers

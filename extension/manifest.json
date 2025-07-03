@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Web Chat Assistant",
+  "description": "Chat with any website using a chatbot interface.",
+  "version": "1.0",
+  "permissions": ["activeTab", "scripting", "tabs"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html"
+
+  }
+}
