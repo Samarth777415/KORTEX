@@ -85,7 +85,13 @@ HF_TOKEN=your_huggingface_token
 > **Kortex** is derived from “cortex” — the part of the brain responsible for reasoning and decision-making — reflecting the AI’s ability to understand and generate intelligent answers from complex web content.
 
 ---
+### 🖼️ Kortex Architecture – RAG Pipeline
 
+Here’s how  Kortex Architecture looks:
+
+![Kortex Architecture](docs/HTML-rag-diagram.jpg) 
+
+---
 ### 📌 Future Plans
 
 * ✅ Chat history cloud sync (beyond localStorage)
