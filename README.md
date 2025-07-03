@@ -1,8 +1,4 @@
-Here's a professional, concise, and GenAI-focused **`README.md`** file for your Chrome extension project named **Kortex**:
-
----
-
-## 🧠 Kortex – Chat with Any Website Using GenAI
+### 🧠 Kortex – Chat with Any Website Using GenAI
 
 **Kortex** is a Chrome Extension powered by **Generative AI (GenAI)** that lets you chat with any webpage like you're talking to ChatGPT. It reads and understands the content of the current tab and answers your questions in context.
 
