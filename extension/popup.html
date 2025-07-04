@@ -4,13 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat with Website</title>
+
+  <!-- ✅ PrismJS for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.css" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+
   <link rel="stylesheet" href="style.css" />
-  
 </head>
 <body>
   <div id="chat-container">
-    <div id="chat-header">🤖 KORTEX (Chat with Website)</div>
-    <div id="chat-messages" class="scroll"></div>
+    <div id="chat-header">🤖 KORTEX</div>
+
+    <div id="chat-messages" class="scroll">
+      <!-- Example messages -->
+      <div class="message user-message">
+        Hello! Can you help me understand this extension?
+      </div>
+      <div class="message bot-message">
+        Certainly! This extension allows you to interact with any website using AI. It reads and analyzes the website's content, then answers your questions based on that content — almost like chatting with the website itself.
+      </div>
+      <div class="message user-message">
+        What can I do with it?
+      </div>
+      <div class="message bot-message">
+        You can ask questions about the current page you're viewing — for example, <code>"What is this company's mission?"</code> or <code>"Summarize the product details."</code> It’s useful for quickly understanding long articles, product pages, policies, or documentation.
+      </div>
+      <div class="message bot-message">
+        🔄 Loading website content. Please wait...
+      </div>
+    </div>
+
     <div id="chat-input-container">
       <input type="text" id="chat-input" placeholder="Ask me anything..." />
       <button id="send-btn">➤</button>

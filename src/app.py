@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict
@@ -31,7 +31,7 @@ app = FastAPI()
 # Enable CORS so Chrome extension can access the API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Ideally replace with ["chrome-extension://<extension_id>"]
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -57,8 +57,8 @@ def get_vectorstore_from_url(url: str):
     document_chunks = text_splitter.split_documents(document)
 
     embedding = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"}  )
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
 
     vector_store = FAISS.from_documents(document_chunks, embedding)
     return vector_store
@@ -101,20 +101,33 @@ def get_response(user_input, chat_history, vector_store):
 
     return completion.choices[0].message.content
 
-# FastAPI Routes
+# Routes
 @app.post("/init")
 def init(payload: InitRequest):
     url = payload.url
-    if url not in sessions:
-        sessions[url] = {
-            "chat_history": [AIMessage(content="Hello, I am a bot. How can I help you?")],
-            "vector_store": None
+
+    try:
+        if url not in sessions:
+            sessions[url] = {
+                "chat_history": [AIMessage(content="Welcome to Kortex")],
+                "vector_store": None
+            }
+
+        if sessions[url]["vector_store"] is None:
+            sessions[url]["vector_store"] = get_vectorstore_from_url(url)
+            sessions[url]["chat_history"].append(
+                AIMessage(content="✅ Website content loaded. You can now start chatting!")
+            )
+
+        return {
+            "status": "initialized and ready",
+            "chat_history": format_chat_history(sessions[url]["chat_history"])
         }
 
-    if sessions[url]["vector_store"] is None:
-        sessions[url]["vector_store"] = get_vectorstore_from_url(url)
-
-    return {"status": "initialized"}
+    except Exception as e:
+        error_msg = f"❌ Failed to load website: {str(e)}"
+        sessions[url]["chat_history"].append(AIMessage(content=error_msg))
+        raise HTTPException(status_code=500, detail=error_msg)
 
 @app.post("/chat")
 def chat(payload: ChatRequest):
@@ -122,12 +135,35 @@ def chat(payload: ChatRequest):
     user_message = payload.message
 
     if url not in sessions:
-        return {"error": "URL not initialized. Call /init first."}
+        raise HTTPException(status_code=400, detail="URL not initialized. Call /init first.")
 
     session = sessions[url]
-    response = get_response(user_message, session["chat_history"], session["vector_store"])
 
-    session["chat_history"].append(HumanMessage(content=user_message))
-    session["chat_history"].append(AIMessage(content=response))
+    if session["vector_store"] is None:
+        msg = "⏳ Still loading website content. Please wait a moment before chatting."
+        session["chat_history"].append(AIMessage(content=msg))
+        return {
+            "response": msg,
+            "chat_history": format_chat_history(session["chat_history"])
+        }
 
-    return {"response": response}
+    try:
+        response = get_response(user_message, session["chat_history"], session["vector_store"])
+
+        session["chat_history"].append(HumanMessage(content=user_message))
+        session["chat_history"].append(AIMessage(content=response))
+
+        return {
+            "response": response,
+            "chat_history": format_chat_history(session["chat_history"])
+        }
+
+    except Exception as e:
+        error_msg = f"❌ Chat failed: {str(e)}"
+        session["chat_history"].append(AIMessage(content=error_msg))
+        raise HTTPException(status_code=500, detail=error_msg)
+
+    except Exception as e:
+        error_msg = f"❌ Chat failed: {str(e)}"
+        session["chat_history"].append(AIMessage(content=error_msg))
+        raise HTTPException(status_code=500, detail=error_msg)

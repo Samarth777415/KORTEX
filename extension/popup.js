@@ -25,16 +25,24 @@ function loadChatHistory(url) {
 
 // ===== 📬 Message Display =====
 
-function appendMessage(message, type) {
+function appendMessage(message, type, save = true) {
     const div = document.createElement("div");
-    div.className = `message ${type}`;
-    div.innerHTML = formatMessage(message); // convert formatting
+
+    if (type === "user") {
+        div.className = "message user-message";
+    } else {
+        div.className = "message bot-message";
+    }
+
+    div.innerHTML = formatMessage(message || "");  // fallback to empty string
     chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Save chat after adding new message
-    saveChatHistory(currentUrl);
+    if (save && currentUrl) {
+        saveChatHistory(currentUrl);
+    }
 }
+
 
 // Prettify message (**bold**, \n → <br>)
 function formatMessage(text) {
@@ -66,12 +74,24 @@ async function initSession(url) {
             body: JSON.stringify({ url })
         });
 
+        const data = await res.json();
+
         if (!res.ok) {
-            const error = await res.json();
-            appendMessage("❌ " + error.detail, "bot");
+            appendMessage("❌ " + data.detail, "bot", false);
+            return;
         }
+
+        // ✅ Show backend-generated system messages in chat
+        if (data.chat_history && Array.isArray(data.chat_history)) {
+            chatMessages.innerHTML = ""; // Clear demo messages
+            data.chat_history.forEach(msg => {
+                const role = msg.role === "user" ? "user" : "bot"; // dynamic role
+                appendMessage(msg.content, role);
+            });
+        }
+
     } catch (err) {
-        appendMessage("❌ Could not initialize website context.", "bot");
+        appendMessage("❌ Could not initialize website context.", "bot", false);
         console.error(err);
     }
 }
@@ -82,7 +102,7 @@ async function sendMessage() {
     const userMessage = input.value.trim();
     if (!userMessage) return;
 
-    appendMessage(userMessage, "user");
+    appendMessage(userMessage, "user"); // user message
     input.value = "";
 
     try {
@@ -97,13 +117,17 @@ async function sendMessage() {
 
         const data = await res.json();
         if (data.response) {
-            appendMessage(data.response, "bot");
+            appendMessage(data.response, "bot"); // bot response
+        } else if (data.chat_history) {
+            data.chat_history.forEach(msg => {
+                appendMessage(msg, "bot");
+            });
         } else {
-            appendMessage("❌ No response from AI.", "bot");
+            appendMessage("❌ No response from AI.", "bot", false);
         }
     } catch (error) {
         console.error("Chat error:", error);
-        appendMessage("❌ Backend not responding.", "bot");
+        appendMessage("❌ Backend not responding.", "bot", false);
     }
 }
 
@@ -114,15 +138,13 @@ async function sendMessage() {
         currentUrl = await getCurrentTabUrl();
         await initSession(currentUrl);
 
-        // Load chat history for today's visit to this URL
+        // Load chat history for today's visit to this URL (if not already shown)
         loadChatHistory(currentUrl);
-
-        // Show welcome message only if history is empty
         if (!chatMessages.innerHTML.trim()) {
             appendMessage("👋 You can now ask me anything about this page!", "bot");
         }
     } catch (err) {
-        appendMessage("❌ Failed to get current URL.", "bot");
+        appendMessage("❌ Failed to get current URL.", "bot", false);
         console.error(err);
     }
 })();
