@@ -5,7 +5,7 @@
 > Think of it as your **personal AI assistant for the web**, intelligently tailored to each page you visit.
 
 ---
-![[Kortex Demo](docs/Kortex_demo.gif)](https://youtu.be/n4cO67uanW0)
+![Kortex Demo](docs/Kortex_demo.gif)
 
 ### 🚀 Features
 
