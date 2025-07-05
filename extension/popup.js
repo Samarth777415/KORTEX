@@ -43,14 +43,39 @@ function appendMessage(message, type, save = true) {
     }
 }
 
-
-// Prettify message (**bold**, \n → <br>)
 function formatMessage(text) {
+    if (!text || typeof text !== "string") return "";
+
     return text
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")  // bold
-        .replace(/\n{2,}/g, "<br><br>")                     // double newline
-        .replace(/\n/g, "<br>");                            // single newline
+        // Headings
+        .replace(/^### (.*$)/gim, '<strong>$1</strong>')
+        .replace(/^## (.*$)/gim, '<strong>$1</strong>')
+        .replace(/^# (.*$)/gim, '<strong>$1</strong>')
+
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+
+        // Italic
+        .replace(/\*(.*?)\*/g, "<em>$1</em>")
+        .replace(/_(.*?)_/g, "<em>$1</em>")
+
+        // Inline code
+        .replace(/`([^`\n]+?)`/g, "<code>$1</code>")
+
+        // Fenced code blocks (```code```)
+        .replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
+
+        // Bulleted list (dash or asterisk)
+        .replace(/^[-*] (.*)/gm, "• $1")
+
+        // Double newlines = paragraph
+        .replace(/\n{2,}/g, "<br><br>")
+
+        // Single newline = line break
+        .replace(/\n/g, "<br>");
 }
+
+
 
 // ===== 🌐 URL + Backend Initialization =====
 

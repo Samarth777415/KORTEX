@@ -162,8 +162,3 @@ def chat(payload: ChatRequest):
         error_msg = f"❌ Chat failed: {str(e)}"
         session["chat_history"].append(AIMessage(content=error_msg))
         raise HTTPException(status_code=500, detail=error_msg)
-
-    except Exception as e:
-        error_msg = f"❌ Chat failed: {str(e)}"
-        session["chat_history"].append(AIMessage(content=error_msg))
-        raise HTTPException(status_code=500, detail=error_msg)
