@@ -4,7 +4,7 @@
 
 > Think of it as your **personal AI assistant for the web**, intelligently tailored to each page you visit.
 ---
-### Kortex Youtube Link
+### 🔴🎥 Kortex Youtube Link
 [![Watch the Kortex Demo](https://img.youtube.com/vi/n4cO67uanW0/maxresdefault.jpg)](https://youtu.be/n4cO67uanW0)
 ---
 ### Kortex Demo
